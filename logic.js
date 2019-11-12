@@ -1,7 +1,6 @@
 // Store our API endpoint inside queryUrl
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson";
 
-// Perform a GET request to the query URL
 d3.json(queryUrl, function(data) {
   // Once we get a response, send the data.features object to the createFeatures function
   createFeatures(data.features);
@@ -9,28 +8,25 @@ d3.json(queryUrl, function(data) {
 
 function createFeatures(earthquakeData) {
 
-    function onEachFeature(feature, layer) {
-        layer.bindPopup("<h3>" + feature.properties.place +
-          "</h3><hr><p>" + new Date(feature.properties.time) + "</p>" +
-          "<p>Magnitude: " + feature.properties.mag + "</p>");
-      }
-    
-      // Create a GeoJSON layer containing the features array on the earthquakeData object
-      // Run the onEachFeature function once for each piece of data in the array
-      var earthquakes = L.geoJSON(earthquakeData, {
-        onEachFeature: onEachFeature,
-        pointToLayer: function (feature, latlng) {
-            var color;
-            if (feature.properties.mag < 2 ) {
-              color = 'red'
+  function onEachFeature(feature, layer) {
+    layer.bindPopup("<h3>" + feature.properties.place +
+      "</h3><hr><p>" + new Date(feature.properties.mag) + "</p>");
+  }
+
+  var earthquakes = L.geoJSON(earthquakeData, {
+    onEachFeature: onEachFeature,
+      pointToLayer: function (feature, latlng) {
+        var color;
+          if (feature.properties.mag < 2 ) {
+            color = 'red'
             } else if (feature.properties.mag < 4) {
-              color = "orange"
+            color = "orange"
             } else if (feature.properties.mag < 6) {
-              color = "yellow"
+            color = "yellow"
             } else if (feature.properties.mag < 8) {
-              color = "green"
+            color = "green"
             } else  {
-              color = "blue"
+            color = "blue"
             }
            var circleOptions = {
               radius: 3*feature.properties.mag,
@@ -42,7 +38,11 @@ function createFeatures(earthquakeData) {
             };
             return L.circleMarker(latlng, circleOptions);
           }
-      });
+});
+
+  // Sending our earthquakes layer to the createMap function
+  createMap(earthquakes);
+}
 
 function createMap(earthquakes) {
 
@@ -84,31 +84,30 @@ function createMap(earthquakes) {
   }).addTo(myMap);
 }
 
-function getColor(x) {
-    return x < 2 ? 'red' :
-          x < 4  ? 'orange' :
-          x < 6  ? 'yellow' :
-          x < 8  ? 'green' :
-          x < 10  ? 'blue' :
-                   'purple';
-}
-  var legend = L.control({position: 'bottomright'});
+// function getColor(x) {
+//   return x < 2 ? 'red' :
+//         x < 4  ? 'orange' :
+//         x < 6  ? 'yellow' :
+//         x < 8  ? 'green' :
+//         x < 10  ? 'blue' :
+//                   'purple';
+// }
+// var legend = L.control({position: 'bottomright'});
 
-  legend.onAdd = function (map) {
+// legend.onAdd = function (map) {
 
-      var div = L.DomUtil.create('div', 'info legend'),
-      scores = [0, 2, 4, 6, 8, 10],
-      labels = [];
+//   var div = L.DomUtil.create('div', 'info legend'),
+//   scores = [0, 2, 4, 6, 8, 10],
+//   labels = [];
 
-      for (var i = 0; i < scores.length; i++) {
-          div.innerHTML +=
-              '<i style="background:' + getColor(scores[i]) + '"> ' +
-              scores[i] + (scores[i + 1] ? '&ndash;' + scores[i + 1] + '</i><br>' : '+');
-  }
+//     for (var i = 0; i < scores.length; i++) {
+//       div.innerHTML +=
+//       '<i style="background:' + getColor(scores[i]) + '"> ' +
+//         scores[i] + (scores[i + 1] ? '&ndash;' + scores[i + 1] + '</i><br>' : '+');
+//   }
 
-  return div;
-  };
+// return div;
+// };
+// legend.addTo(myMap);
+// }
 
-  legend.addTo(myMap);
-
-}
